@@ -37,8 +37,6 @@ struct ContentView: View {
                                 )
                             }
                     }
-                    Text("hello")
-                        .font(.system(size: 16, weight: .light, design: .default))
                 }
                 .padding()
             }
