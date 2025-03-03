@@ -15,11 +15,23 @@ struct TextItem: Identifiable {
 
 class JavaScriptManager: ObservableObject {
     @Published var textItems: [TextItem] = []
-    let context: JSContext
+    private var context: JSContext?
     private var timers: [String: Timer] = [:]
+    private var reloadTimer: Timer?
+    private let serverURL = "http://localhost:3000/script.js"
+    private var currentSource: String = ""
     
     init() {
-        context = JSContext()!
+        createContext()
+        loadJavaScript()
+        setupPolling()
+    }
+    
+    private func createContext() {
+        // Create fresh context
+        context = JSContext()
+        
+        guard let context = context else { return }
         
         // Add exception handler
         context.exceptionHandler = { context, exception in
@@ -82,29 +94,88 @@ class JavaScriptManager: ObservableObject {
         context.setObject(removeText, forKeyedSubscript: "removeSwiftText" as NSString)
         context.setObject(setInterval, forKeyedSubscript: "setInterval" as NSString)
         context.setObject(clearInterval, forKeyedSubscript: "clearInterval" as NSString)
-        
-        // Load the JavaScript file
-        if let jsPath = Bundle.main.path(forResource: "script", ofType: "js"),
-           let jsSource = try? String(contentsOfFile: jsPath, encoding: .utf8) {
-            print("📜 Loading JavaScript file...")
-            context.evaluateScript(jsSource)
-        } else {
-            print("⚠️ Could not load JavaScript file")
+    }
+    
+    private func setupPolling() {
+        reloadTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+            self?.checkForChanges()
         }
+    }
+    
+    private func checkForChanges() {
+        guard let url = URL(string: serverURL) else { return }
+        
+        URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
+            guard let data = data,
+                  let source = String(data: data, encoding: .utf8),
+                  source != self?.currentSource else {
+                return
+            }
+            
+            DispatchQueue.main.async {
+                print("🔄 JavaScript changed, reloading...")
+                self?.currentSource = source
+                self?.clearAllState()
+                self?.createContext()
+                self?.context?.evaluateScript(source)
+                print("✅ JavaScript reloaded")
+            }
+        }.resume()
+    }
+    
+    private func loadJavaScript() {
+        print("📜 Loading JavaScript from server...")
+        
+        guard let url = URL(string: serverURL) else {
+            print("⚠️ Invalid server URL")
+            return
+        }
+        
+        URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
+            if let error = error {
+                print("⚠️ Error loading JavaScript:", error)
+                return
+            }
+            
+            guard let data = data,
+                  let source = String(data: data, encoding: .utf8) else {
+                print("⚠️ Invalid JavaScript data")
+                return
+            }
+            
+            DispatchQueue.main.async {
+                self?.currentSource = source
+                self?.clearAllState()
+                self?.createContext()
+                self?.context?.evaluateScript(source)
+                print("✅ JavaScript loaded and evaluated")
+            }
+        }.resume()
+    }
+    
+    private func clearAllState() {
+        // Clear all timers
+        timers.values.forEach { $0.invalidate() }
+        timers.removeAll()
+        
+        // Clear all texts
+        textItems.removeAll()
+        
+        // Clear context
+        context = nil
     }
     
     func evaluateScript(_ script: String) {
         print("🔄 Evaluating script:", script)
-        context.evaluateScript(script)
-        if let exception = context.exception {
+        context?.evaluateScript(script)
+        if let exception = context?.exception {
             print("⚠️ Error evaluating script:", exception.toString() ?? "unknown error")
         }
     }
     
     deinit {
-        // Clean up all timers
-        timers.values.forEach { $0.invalidate() }
-        timers.removeAll()
+        clearAllState()
+        reloadTimer?.invalidate()
     }
 }
 

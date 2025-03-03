@@ -2,9 +2,9 @@ function getRandomNumber() {
     return Math.random();
 }
 
-// Keep track of created text items and timers
-let textIds = new Set();
-let timerIds = new Set();
+// State for this instance
+const textIds = new Set();
+const timerIds = new Set();
 
 // Helper function to generate unique IDs
 function generateId() {
@@ -62,4 +62,3 @@ function clearAllTexts() {
 createRandomText();
 createCounterText();
 createRandomText();
-createSwiftText(generateId(), "Lol");
