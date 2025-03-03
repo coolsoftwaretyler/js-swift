@@ -370,15 +370,15 @@ struct ContentView: View {
             
             VStack(spacing: 10) {
                 Button("Add Random Text") {
-                    jsManager.evaluateScript("createRandomText()")
+                    jsManager.evaluateScript("SwiftJSBridge.createRandomText()")
                 }
                 
                 Button("Create Counter Text") {
-                    jsManager.evaluateScript("createCounterText()")
+                    jsManager.evaluateScript("SwiftJSBridge.createCounterText()")
                 }
                 
                 Button("Clear All") {
-                    jsManager.evaluateScript("clearAllTexts()")
+                    jsManager.evaluateScript("SwiftJSBridge.clearAllTexts()")
                 }
             }
             .padding()
