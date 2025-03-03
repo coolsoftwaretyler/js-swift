@@ -11,10 +11,10 @@ const server = http.createServer((req, res) => {
         res.setHeader('Content-Type', 'application/javascript');
         
         // Read and serve the JavaScript file
-        fs.readFile(path.join(__dirname, 'JS', 'script.js'), 'utf8', (err, data) => {
+        fs.readFile(path.join(__dirname, 'index.js'), 'utf8', (err, data) => {
             if (err) {
                 res.statusCode = 500;
-                res.end('Error loading script.js');
+                res.end('Error loading index.js');
                 return;
             }
             res.end(data);
@@ -30,8 +30,8 @@ server.listen(PORT, () => {
 });
 
 // Watch for file changes
-fs.watch(path.join(__dirname, 'JS', 'script.js'), (eventType, filename) => {
+fs.watch(path.join(__dirname, 'index.js'), (eventType, filename) => {
     if (eventType === 'change') {
-        console.log('script.js changed:', new Date().toLocaleTimeString());
+        console.log('index.js changed:', new Date().toLocaleTimeString());
     }
 }); 
