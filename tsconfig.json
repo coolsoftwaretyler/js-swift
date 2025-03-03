@@ -2,13 +2,12 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "ES2020",
-    "outDir": "./dist",
     "rootDir": "./typescript",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "declaration": true
+    "moduleResolution": "node"
   },
   "include": ["typescript/**/*"],
   "exclude": ["node_modules"]
