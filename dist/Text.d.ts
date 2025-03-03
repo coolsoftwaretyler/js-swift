@@ -21,7 +21,7 @@ export interface TextConfig {
     text: string;
     style?: TextStyle;
 }
-export declare class TextBuilder {
+export declare class Text {
     private textIds;
     private id;
     private text;

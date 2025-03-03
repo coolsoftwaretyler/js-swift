@@ -1,6 +1,5 @@
 const http = require('http');
 const esbuild = require('esbuild');
-const path = require('path');
 const fs = require('fs');
 const { exec } = require('child_process');
 const { promisify } = require('util');

@@ -1,14 +1,10 @@
-import { TextBuilder } from './TextBuilder.js';
+import { Text } from './Text.js';
 // State for this instance
 const textIds = new Set();
 const timerIds = new Set();
 // Helper function to generate unique IDs
 function generateId() {
     return 'text_' + Math.random().toString(36).substr(2, 9);
-}
-// Create a new text with builder pattern
-function text(content) {
-    return new TextBuilder(generateId(), content, textIds);
 }
 // Create a new text with random content
 export function createRandomText() {
@@ -20,31 +16,41 @@ export function createRandomText() {
         "JavaScript is fun! 🎮"
     ];
     const randomText = randomTexts[Math.floor(Math.random() * randomTexts.length)];
-    text(randomText)
-        .fontSize(10)
-        .color('#1e88e5')
-        .backgroundColor('#e3f2fd')
-        .padding(12)
-        .cornerRadius(10)
-        .shadow(4, 2, 2, '#000000')
-        .create();
+    const config = {
+        text: randomText,
+        style: {
+            fontSize: 10,
+            color: '#1e88e5',
+            backgroundColor: '#e3f2fd',
+            padding: 12,
+            cornerRadius: 10,
+            shadowRadius: 4,
+            shadowX: 2,
+            shadowY: 2,
+            shadowColor: '#000000'
+        }
+    };
+    new Text(config, textIds).create();
 }
 // Create a text with a counter
 export function createCounterText() {
-    const id = generateId();
     let count = 0;
-    const builder = text(`Counter: ${count}`)
-        .fontSize(24)
-        .fontWeight('bold')
-        .color('#4a148c')
-        .backgroundColor('#f3e5f5')
-        .padding(16)
-        .cornerRadius(12)
-        .align('center')
-        .create();
+    const config = {
+        text: `Counter: ${count}`,
+        style: {
+            fontSize: 24,
+            fontWeight: 'bold',
+            color: '#4a148c',
+            backgroundColor: '#f3e5f5',
+            padding: 16,
+            cornerRadius: 12,
+            textAlignment: 'center'
+        }
+    };
+    const builder = new Text(config, textIds).create();
     const timerId = setInterval(() => {
         count++;
-        builder.update(`Counter: ${count}`);
+        builder.update({ text: `Counter: ${count}` });
     }, 1000);
     timerIds.add(timerId);
 }
@@ -65,3 +71,4 @@ export function clearAllTexts() {
 createRandomText();
 createCounterText();
 createRandomText();
+new Text({ text: 'Hello from JavaScript!' }, textIds).create();

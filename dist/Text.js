@@ -2,7 +2,7 @@ const defaultStyle = {
     fontSize: 32,
     fontWeight: 'regular',
     color: '#000000',
-    backgroundColor: 'clear',
+    backgroundColor: '#ffffff',
     padding: 8,
     cornerRadius: 8,
     italic: false,
@@ -13,7 +13,7 @@ const defaultStyle = {
     textAlignment: 'leading'
 };
 // Text styling API
-export class TextBuilder {
+export class Text {
     constructor(config, textIds) {
         this.textIds = textIds;
         this.id = config.id || generateId();

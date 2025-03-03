@@ -26,86 +26,30 @@ var SwiftJSBridge = (() => {
     createRandomText: () => createRandomText
   });
 
-  // dist/TextBuilder.js
-  var TextBuilder = class {
-    constructor(id, text2, textIds2) {
+  // dist/Text.js
+  var defaultStyle = {
+    fontSize: 32,
+    fontWeight: "regular",
+    color: "#000000",
+    backgroundColor: "#ffffff",
+    padding: 8,
+    cornerRadius: 8,
+    italic: false,
+    underline: false,
+    strikethrough: false,
+    kerning: 0,
+    lineSpacing: 0,
+    textAlignment: "leading"
+  };
+  var Text = class {
+    constructor(config, textIds2) {
       this.textIds = textIds2;
-      this.id = id;
-      this.text = text2;
+      this.id = config.id || generateId();
+      this.text = config.text;
       this.style = {
-        fontSize: 32,
-        fontWeight: "regular",
-        color: "#000000",
-        backgroundColor: "clear",
-        padding: 8,
-        cornerRadius: 8,
-        italic: false,
-        underline: false,
-        strikethrough: false,
-        kerning: 0,
-        lineSpacing: 0,
-        textAlignment: "leading"
+        ...defaultStyle,
+        ...config.style || {}
       };
-    }
-    // Font styling
-    fontSize(size) {
-      this.style.fontSize = size;
-      return this;
-    }
-    fontWeight(weight) {
-      this.style.fontWeight = weight;
-      return this;
-    }
-    // Colors
-    color(hex) {
-      this.style.color = hex;
-      return this;
-    }
-    backgroundColor(hex) {
-      this.style.backgroundColor = hex;
-      return this;
-    }
-    // Layout
-    padding(value) {
-      this.style.padding = value;
-      return this;
-    }
-    cornerRadius(value) {
-      this.style.cornerRadius = value;
-      return this;
-    }
-    // Text style
-    italic() {
-      this.style.italic = true;
-      return this;
-    }
-    underline() {
-      this.style.underline = true;
-      return this;
-    }
-    strikethrough() {
-      this.style.strikethrough = true;
-      return this;
-    }
-    kerning(value) {
-      this.style.kerning = value;
-      return this;
-    }
-    lineSpacing(value) {
-      this.style.lineSpacing = value;
-      return this;
-    }
-    align(alignment) {
-      this.style.textAlignment = alignment;
-      return this;
-    }
-    // Shadow
-    shadow(radius, x = 0, y = 0, color = "#000000") {
-      this.style.shadowRadius = radius;
-      this.style.shadowX = x;
-      this.style.shadowY = y;
-      this.style.shadowColor = color;
-      return this;
     }
     // Create the text in SwiftUI
     create() {
@@ -114,21 +58,31 @@ var SwiftJSBridge = (() => {
       return this;
     }
     // Update existing text
-    update(newText = null) {
-      updateSwiftText(this.id, newText || this.text, this.style);
+    update(config) {
+      if (config.text !== void 0) {
+        this.text = config.text;
+      }
+      if (config.style) {
+        this.style = {
+          ...this.style,
+          ...config.style
+        };
+      }
+      updateSwiftText(this.id, this.text, this.style);
       return this;
     }
+    // Get the current ID
+    getId() {
+      return this.id;
+    }
   };
+  function generateId() {
+    return "text_" + Math.random().toString(36).substr(2, 9);
+  }
 
   // dist/index.js
   var textIds = /* @__PURE__ */ new Set();
   var timerIds = /* @__PURE__ */ new Set();
-  function generateId() {
-    return "text_" + Math.random().toString(36).substr(2, 9);
-  }
-  function text(content) {
-    return new TextBuilder(generateId(), content, textIds);
-  }
   function createRandomText() {
     const randomTexts = [
       "Hello from JavaScript! \u{1F44B}",
@@ -138,15 +92,40 @@ var SwiftJSBridge = (() => {
       "JavaScript is fun! \u{1F3AE}"
     ];
     const randomText = randomTexts[Math.floor(Math.random() * randomTexts.length)];
-    text(randomText).fontSize(10).color("#1e88e5").backgroundColor("#e3f2fd").padding(12).cornerRadius(10).shadow(4, 2, 2, "#000000").create();
+    const config = {
+      text: randomText,
+      style: {
+        fontSize: 10,
+        color: "#1e88e5",
+        backgroundColor: "#e3f2fd",
+        padding: 12,
+        cornerRadius: 10,
+        shadowRadius: 4,
+        shadowX: 2,
+        shadowY: 2,
+        shadowColor: "#000000"
+      }
+    };
+    new Text(config, textIds).create();
   }
   function createCounterText() {
-    const id = generateId();
     let count = 0;
-    const builder = text(`Counter: ${count}`).fontSize(24).fontWeight("bold").color("#4a148c").backgroundColor("#f3e5f5").padding(16).cornerRadius(12).align("center").create();
+    const config = {
+      text: `Counter: ${count}`,
+      style: {
+        fontSize: 24,
+        fontWeight: "bold",
+        color: "#4a148c",
+        backgroundColor: "#f3e5f5",
+        padding: 16,
+        cornerRadius: 12,
+        textAlignment: "center"
+      }
+    };
+    const builder = new Text(config, textIds).create();
     const timerId = setInterval(() => {
       count++;
-      builder.update(`Counter: ${count}`);
+      builder.update({ text: `Counter: ${count}` });
     }, 1e3);
     timerIds.add(timerId);
   }
@@ -163,6 +142,7 @@ var SwiftJSBridge = (() => {
   createRandomText();
   createCounterText();
   createRandomText();
+  new Text({ text: "Hello from JavaScript!" }, textIds).create();
   return __toCommonJS(index_exports);
 })();
 //# sourceMappingURL=index.js.map
