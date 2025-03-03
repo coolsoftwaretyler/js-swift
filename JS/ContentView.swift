@@ -365,23 +365,6 @@ struct ContentView: View {
                 }
                 .padding()
             }
-            
-            Divider()
-            
-            VStack(spacing: 10) {
-                Button("Add Random Text") {
-                    jsManager.evaluateScript("SwiftJSBridge.createRandomText()")
-                }
-                
-                Button("Create Counter Text") {
-                    jsManager.evaluateScript("SwiftJSBridge.createCounterText()")
-                }
-                
-                Button("Clear All") {
-                    jsManager.evaluateScript("SwiftJSBridge.clearAllTexts()")
-                }
-            }
-            .padding()
         }
     }
 }
