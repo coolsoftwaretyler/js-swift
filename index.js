@@ -1,3 +1,4 @@
+"use strict";
 var SwiftJSBridge = (() => {
   var __defProp = Object.defineProperty;
   var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
@@ -17,17 +18,16 @@ var SwiftJSBridge = (() => {
   };
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-  // javascript/entrypoint.js
-  var entrypoint_exports = {};
-  __export(entrypoint_exports, {
+  // dist/index.js
+  var index_exports = {};
+  __export(index_exports, {
     clearAllTexts: () => clearAllTexts,
     createCounterText: () => createCounterText,
     createRandomText: () => createRandomText
   });
 
-  // javascript/TextBuilder.js
+  // dist/TextBuilder.js
   var TextBuilder = class {
-    // textIds is a Set of all text IDs
     constructor(id, text2, textIds2) {
       this.textIds = textIds2;
       this.id = id;
@@ -120,7 +120,7 @@ var SwiftJSBridge = (() => {
     }
   };
 
-  // javascript/entrypoint.js
+  // dist/index.js
   var textIds = /* @__PURE__ */ new Set();
   var timerIds = /* @__PURE__ */ new Set();
   function generateId() {
@@ -163,7 +163,6 @@ var SwiftJSBridge = (() => {
   createRandomText();
   createCounterText();
   createRandomText();
-  return __toCommonJS(entrypoint_exports);
+  return __toCommonJS(index_exports);
 })();
-window.SwiftJSBridge = SwiftJSBridge.default || SwiftJSBridge;
 //# sourceMappingURL=index.js.map

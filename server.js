@@ -2,24 +2,43 @@ const http = require('http');
 const esbuild = require('esbuild');
 const path = require('path');
 const fs = require('fs');
+const { exec } = require('child_process');
+const { promisify } = require('util');
 
+const execAsync = promisify(exec);
 const PORT = 3000;
+
+// Function to compile TypeScript
+async function compileTypeScript() {
+    try {
+        await execAsync('npx tsc');
+        console.log('TypeScript compilation successful');
+        return true;
+    } catch (error) {
+        console.error('TypeScript compilation error:', error.stderr);
+        return false;
+    }
+}
 
 // Function to bundle the code
 async function bundle() {
     try {
+        // First compile TypeScript
+        const tsSuccess = await compileTypeScript();
+        if (!tsSuccess) {
+            throw new Error('TypeScript compilation failed');
+        }
+
+        // Then bundle with esbuild
         const result = await esbuild.build({
-            entryPoints: ['./javascript/entrypoint.js'],
+            entryPoints: ['./dist/index.js'],
             bundle: true,
             format: 'iife',
             target: 'es2020',
             outfile: './index.js',
             sourcemap: true,
             platform: 'browser',
-            globalName: 'SwiftJSBridge',
-            footer: {
-                js: 'window.SwiftJSBridge = SwiftJSBridge.default || SwiftJSBridge;'
-            }
+            globalName: 'SwiftJSBridge'
         });
         console.log('Bundle successful');
         return true;
